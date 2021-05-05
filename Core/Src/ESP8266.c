@@ -15,7 +15,6 @@ static char rx_buffer[RX_BUFFER_SIZE];
 static uint8_t rx_buffer_index = 0;
 static bool error_flag = false;
 static bool fail_flag = false;
-static int retryConection = 0;
 
 
 void init_uart_interrupt(void){
@@ -42,7 +41,7 @@ const unsigned long hash(const char *str) {
     return hash;
 }
 
-const char* esp8266_send_command(const char* command)
+const char* esp8266_sendCommand(const char* command)
 {
 	rx_buffer_index = 0;
 	error_flag = false;
@@ -95,13 +94,13 @@ void esp8266_initialize()
 	//Step 2, initialize station mode
 	char set_ESP8266_mode[] = "AT+CWMODE=1\r\n";
 	//HAL_UART_Transmit(&huart2, (uint8_t *) set_ESP8266_mode, strlen(set_ESP8266_mode), 100); //For testing
-	esp8266_send_command(set_ESP8266_mode);
+	esp8266_sendCommand(set_ESP8266_mode);
 
 	//Step 3, connect to wifi using "networkinfo.h"
 	char connect_wifi[30];
 	sprintf (connect_wifi, "%s\"%s\",\"%s\"\r\n", ESP8266_AT_CWJAP_SET, SSID, PWD);
 	//HAL_UART_Transmit(&huart2, (uint8_t *) connect_wifi, strlen(connect_wifi), 100); //For testing
-	esp8266_send_command(connect_wifi);
+	esp8266_sendCommand(connect_wifi);
 
 	return;
 }
@@ -115,7 +114,8 @@ void eps8266_connection()
 	char tcp_connect[30];
 	sprintf(tcp_connect, "%s\"%s\",\"%s\",%s\r\n", ESP8266_AT_START, connection_type, remote_ip, remote_port);
 	//HAL_UART_Transmit(&huart2, (uint8_t *) tcp_connect, strlen(tcp_connect), 100); //For testing
-	esp8266_send_command(tcp_connect);
+	esp8266_sendCommand(tcp_connect);
+	return;
 }
 
 void esp8266_get_at_send_command(char* ref, uint8_t len){

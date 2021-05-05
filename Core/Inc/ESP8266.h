@@ -250,7 +250,7 @@ HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
  * @param char* command to send
  * @return ESP8266 response
  */
-const char* esp8266_send_command(const char*);
+const char* esp8266_sendCommand(const char*);
 
 /**
  * @brief send data to ESP8266, this is used after calling cipsend
