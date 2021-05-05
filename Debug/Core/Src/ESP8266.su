@@ -1,0 +1,12 @@
+ESP8266.c:21:6:init_uart_interrupt	8	static
+ESP8266.c:26:6:HAL_UART_RxCpltCallback	16	static
+ESP8266.c:36:21:hash	24	static
+ESP8266.c:45:13:esp8266_send_command	16	static
+ESP8266.c:71:13:esp8266_send_data	16	static
+ESP8266.c:90:6:esp8266_initialize	72	static
+ESP8266.c:109:6:esp8266_get_connection_command	32	static
+ESP8266.c:113:6:eps8266_connection	48	static
+ESP8266.c:121:6:esp8266_get_at_send_command	16	static
+ESP8266.c:125:9:esp8266_http_get_request	40	static
+ESP8266.c:134:13:get_return	24	static
+ESP8266.c:225:13:evaluate	4	static

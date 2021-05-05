@@ -1,0 +1,4 @@
+test.c:18:6:Test_program	8	static
+test.c:25:6:Test_wifi_connect	8	static
+test.c:36:6:Test_connection	8	static
+test.c:41:6:Test_sendData	32	static
