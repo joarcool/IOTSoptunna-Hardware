@@ -19,5 +19,6 @@ void Test_program(void);
 void Test_wifi_connect(void);
 void Test_connection(void);
 void Test_sendData(void);
+void Test_ultrasonic(void);
 
 #endif /* INC_TEST_H_ */

@@ -1,0 +1,4 @@
+ultrasonic.c:15:6:microDelay	16	static
+ultrasonic.c:27:6:ultrasonic_reset	8	static
+ultrasonic.c:34:6:ultrasonic_pulse	8	static
+ultrasonic.c:42:6:ultrasonic_distance	32	static
