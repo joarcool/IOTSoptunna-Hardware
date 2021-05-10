@@ -5,8 +5,8 @@
 		 ESP8266 wifi-module, including relevant AT-commands and functions
 		 to use them in regards to the Office Environment Monitor project.
 @file ESP8266.h
-@author  Jonatan Lundqvist Silins, jonls@kth.se
-@date 06-04-2021
+@author  Joar Edling, joaredl@kth.se
+@date 06-05-2021
 @version 1.0
 *******************************************************************************/
 
@@ -78,7 +78,7 @@ static const char HTTP_VERSION[]	 		     = "HTTP/1.1";
 static const char HTTP_HOST[]	 		         = "Host: ";
 static const char HTTP_CONNECTION_CLOSE[]	     = "Connection: close";
 static const char CRLF[] 						 = "\r\n";
-
+//static const char HTTP_REQUEST 					 =
 
 /* AT Commands for the ESP8266, see
  * https://www.espressif.com/sites/default/files/documentation/4a-esp8266_at_instruction_set_en.pdf

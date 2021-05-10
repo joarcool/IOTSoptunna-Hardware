@@ -3,8 +3,8 @@
 @brief functions for the ESP8266 wifi-module
 @details
 @file ESP8266.c
-@author  Jonatan Lundqvist Silins, jonls@kth.se
-@date 06-04-2021
+@author  Joar Edling, joaredl@kth.se
+@date 06-05-2021
 @version 2
 *******************************************************************************/
 #include "ESP8266.h"
