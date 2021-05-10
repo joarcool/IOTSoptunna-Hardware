@@ -1,4 +1,5 @@
-test.c:18:6:Test_program	8	static
-test.c:25:6:Test_wifi_connect	8	static
-test.c:37:6:Test_connection	88	static
-test.c:55:6:Test_sendData	32	static
+test.c:15:6:Test_program	8	static
+test.c:23:6:Test_wifi_connect	8	static
+test.c:35:6:Test_connection	88	static
+test.c:53:6:Test_sendData	32	static
+test.c:62:6:Test_ultrasonic	64	static

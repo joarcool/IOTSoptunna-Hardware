@@ -10,12 +10,14 @@
 #include "usart.h"
 #include "gpio.h"
 #include "networkinfo.h"
+#include "ultrasonic.h"
 
 void Test_program()
 {
 	Test_wifi_connect();
 	Test_connection();
 	//Test_sendData();
+	Test_ultrasonic();
 }
 
 void Test_wifi_connect()
@@ -55,4 +57,25 @@ void Test_sendData()
 	esp8266_sendCommand(send_mode);
 
 	HAL_UART_Transmit(&huart4, (uint8_t*) "hej\r\n", strlen("hej\r\n"), 100);
+}
+
+void Test_ultrasonic()
+{
+	char uart_buf[50];
+	uint32_t distance;
+
+	while (1)
+	  {
+		ultrasonic_reset();
+		ultrasonic_pulse();
+		ultrasonic_distance(distance);
+
+		/* Print result via UART to computer */
+		sprintf(uart_buf, "Distance (cm): %.1d\r\n", distance);
+		HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+
+		/* Do this measurement every second */
+		HAL_Delay(1000);
+
+	  }
 }

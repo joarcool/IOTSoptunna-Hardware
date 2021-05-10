@@ -28,7 +28,8 @@ Core/Src/test.o: ../Core/Src/test.c ../Core/Inc/test.h ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
  ../Core/Inc/usart.h ../Core/Inc/gpio.h ../Core/Inc/ESP8266.h \
- ../Core/Inc/networkinfo.h ../Core/Inc/usart.h ../Core/Inc/gpio.h
+ ../Core/Inc/networkinfo.h ../Core/Inc/usart.h ../Core/Inc/gpio.h \
+ ../Core/Inc/networkinfo.h ../Core/Inc/ultrasonic.h
 
 ../Core/Inc/test.h:
 
@@ -101,3 +102,7 @@ Core/Src/test.o: ../Core/Src/test.c ../Core/Inc/test.h ../Core/Inc/main.h \
 ../Core/Inc/usart.h:
 
 ../Core/Inc/gpio.h:
+
+../Core/Inc/networkinfo.h:
+
+../Core/Inc/ultrasonic.h:
