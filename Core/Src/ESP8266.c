@@ -128,7 +128,7 @@ void esp8266_sendDistance(float distance)
 	char deviceID[] = "101";
 	//float distance = 35.5;
 	sprintf(http_request, "GET /api/data?code=Dx7Hf/AoJhpxh3mVtnWh94wXNe6a2ImWuNtIYVEGlB8v3a3GVj2F5w==&"
-				"deviceId=%s&distance=%.1f\r\n\r\n", deviceID, distance);
+				"deviceId=%s&distance=%.1f HTTP/1.1\r\n\r\n", deviceID, distance);
 
 	char tcp_send[30];
 	sprintf(tcp_send, "AT+CIPSEND=%d\r\n", strlen(http_request));
