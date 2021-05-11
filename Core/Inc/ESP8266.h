@@ -211,6 +211,12 @@ void esp8266_connectWifi(void);
  */
 void eps8266_connection(void);
 /**
+ * @brief Deliveres the message via tcp connection to the API site
+ * @param float distance
+ * @return void
+ */
+void esp8266_sendDistance(float);
+/**
  * @brief build the command for connection to a website
  * @param char* ref, where the command is stored into
  * @param char* connection_type, type of connection "TCP", "UDP" or "SSL"
