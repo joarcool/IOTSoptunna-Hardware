@@ -120,19 +120,19 @@ void eps8266_connection()
 
 void esp8266_sendDistance(float distance)
 {
-	char tcp_connect[30];
+	char tcp_connect[300];
 	sprintf(tcp_connect, "%s\"%s\",\"%s\",%s\r\n", ESP8266_AT_START, connection_type, remote_ip, remote_port);
 	esp8266_sendCommand(tcp_connect);
 
-	char http_request[130];
+	char http_request[200];
 	char deviceID[] = "101";
-	//float distance = 35.5;
-	sprintf(http_request, "GET /api/data?code=Dx7Hf/AoJhpxh3mVtnWh94wXNe6a2ImWuNtIYVEGlB8v3a3GVj2F5w==&"
-				"deviceId=%s&distance=%.1f HTTP/1.1\r\n\r\n", deviceID, distance);
+	sprintf(http_request, "GET /api/data?code=Dx7Hf/AoJhpxh3mVtnWh94wXNe6a2ImWuNtIYVEGlB8v3a3GVj2F5w==&deviceId=%s&distance=%.1f HTTP/1.1\r\n"
+			"Host: smartbin.azurewebsites.net\r\n\r\n", deviceID, distance);
 
-	char tcp_send[30];
+	char tcp_send[100];
 	sprintf(tcp_send, "AT+CIPSEND=%d\r\n", strlen(http_request));
 	esp8266_sendCommand(tcp_send);
+
 	HAL_UART_Transmit(&huart4, (uint8_t*) http_request, strlen(http_request), 100);
 
 	char send_stop[] = "AT+CIPCLOSE=0\r\n";
