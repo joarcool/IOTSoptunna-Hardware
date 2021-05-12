@@ -9,6 +9,7 @@
 #include "ultrasonic.h"
 #include "main.h"
 #include "gpio.h"
+#include "usart.h"
 
 #define usTIM TIM4
 
@@ -24,6 +25,12 @@ void microDelay(uint32_t uSec)
 	usTIM -> SR &= ~(0x0001);
 }
 
+/*
+ * @brief	Function that resets ultrasonic sensor just in case.
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date	11/05/21
+ * */
 void ultrasonic_reset(void)
 {
 	/* Reset trigger port */
@@ -31,6 +38,12 @@ void ultrasonic_reset(void)
 	microDelay(3);
 }
 
+/*
+ * @brief	Sends 10 microseconds long pulse to HC-SR04 trigger pin to activate sensor.
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date 11/05/21
+ * */
 void ultrasonic_pulse(void)
 {
 	/* Send pulse of 10 us to trigger port to activate ultrasonic pulses */
@@ -39,14 +52,65 @@ void ultrasonic_pulse(void)
 	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
 }
 
-void ultrasonic_distance(uint32_t distance)
+/*
+ * @brief	Simple algorithm that checks if the measured distance has changed +-10%.
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date	11/05/21
+ * */
+int ultrasonic_checkDist(float measuredDist, float newDist)
 {
+	float res;
+	if(newDist < measuredDist)
+	{
+		res = (1 - (newDist / measuredDist)) * 100;
+
+		if(res > 10)
+		{
+			return 1;
+		}
+
+		else
+			return 0;
+	}
+
+	else if(measuredDist < newDist)
+	{
+		res = ((newDist / measuredDist) - 1) * 100;
+
+		if(res > 10)
+		{
+			return 1;
+		}
+
+		else
+			return 0;
+	}
+
+	else if(measuredDist == newDist)
+		return 0;
+}
+
+/*
+ * @brief	Whole logic of the distance measuring program. Calculates distance from sensor to object.
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date	11/05/21
+ * */
+void ultrasonic_program(void)
+{
+	char uart_buf[50];
+	float distance;
+	float distanceStart;
+
+	ultrasonic_reset();
+	ultrasonic_pulse();
+
+
+	/* Measure distance only once. Same as in while(1) loop */
 	uint32_t ticks;
+	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_RESET)
 
-	/* While echo pin is held low (reset) */
-	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_RESET);
-
-	/* While echo pin is held high (set) count no. of ticks during a set period of time */
 	ticks = 0;
 	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_SET)
 	{
@@ -55,5 +119,42 @@ void ultrasonic_distance(uint32_t distance)
 	}
 
 	/* Calculate distance */
-	distance = ticks * 2.8 * (0.0343 / 2);
+	distanceStart = ticks * 2.8 * (0.0343 / 2);
+
+	/* Print to test that it works */
+	sprintf(uart_buf, "Start distance (cm): %.1f!\r\n", distanceStart);
+	HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+
+	while (1)
+	  {
+		ultrasonic_reset();
+		ultrasonic_pulse();
+
+		uint32_t ticks;
+		/* While echo pin is held low (reset) */
+		while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_RESET)
+
+		ticks = 0;
+		while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_SET)
+		{
+			ticks++;
+			microDelay(2);
+		}
+
+		/* Calculate distance */
+		distance = ticks * 2.8 * (0.0343 / 2);
+
+		if(ultrasonic_checkDist(distanceStart, distance) == 1)
+		{
+			/* Print result via UART to computer */
+			sprintf(uart_buf, "Distance update (cm): %.1f!\r\n", distance);
+			HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+
+			distanceStart = distance;
+		}
+
+		/* Do this measurement every 5 seconds */
+		HAL_Delay(5000);
+
+	  }
 }
