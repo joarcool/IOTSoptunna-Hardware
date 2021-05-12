@@ -13,6 +13,7 @@
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
+#include "ultrasonic.h"
 #include <string.h>
 
 void Test_program(void);
