@@ -99,7 +99,7 @@ void esp8266_initialize()
 	//Step 3, connect to wifi using "networkinfo.h"
 	char connect_wifi[30];
 	sprintf (connect_wifi, "%s\"%s\",\"%s\"\r\n", ESP8266_AT_CWJAP_SET, SSID, PWD);
-	//HAL_UART_Transmit(&huart2, (uint8_t *) connect_wifi, strlen(connect_wifi), 100); //For testing
+	HAL_UART_Transmit(&huart2, (uint8_t *) connect_wifi, strlen(connect_wifi), 100); //For testing
 	esp8266_sendCommand(connect_wifi);
 
 	return;

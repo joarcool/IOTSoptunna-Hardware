@@ -53,41 +53,19 @@ void ultrasonic_pulse(void)
 }
 
 /*
- * @brief	Simple algorithm that checks if the measured distance has changed +-10%.
+ * @brief	Simple algorithm that checks if the measured distance has changed +-3 cm.
  * @file	ultrasonic.c
  * @author	Axel Ström
  * @date	11/05/21
  * */
 int ultrasonic_checkDist(float measuredDist, float newDist)
 {
-	float res;
-	if(newDist < measuredDist)
-	{
-		res = (1 - (newDist / measuredDist)) * 100;
 
-		if(res > 10)
-		{
-			return 1;
-		}
+	float dist = abs(measuredDist - newDist);
 
-		else
-			return 0;
-	}
-
-	else if(measuredDist < newDist)
-	{
-		res = ((newDist / measuredDist) - 1) * 100;
-
-		if(res > 10)
-		{
-			return 1;
-		}
-
-		else
-			return 0;
-	}
-
-	else if(measuredDist == newDist)
+	if(dist > 3)
+		return 1;
+	else
 		return 0;
 }
 
