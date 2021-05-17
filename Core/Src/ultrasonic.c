@@ -53,42 +53,48 @@ void ultrasonic_pulse(void)
 }
 
 /*
- * @brief	Simple algorithm that checks if the measured distance has changed +-10%.
+ * @brief	Simple algorithm that checks if the measured distance has changed +- 3 cm.
  * @file	ultrasonic.c
  * @author	Axel Ström
  * @date	11/05/21
  * */
 int ultrasonic_checkDist(float measuredDist, float newDist)
 {
-	float res;
-	if(newDist < measuredDist)
-	{
-		res = (1 - (newDist / measuredDist)) * 100;
-
-		if(res > 10)
-		{
-			return 1;
-		}
-
-		else
-			return 0;
-	}
-
-	else if(measuredDist < newDist)
-	{
-		res = ((newDist / measuredDist) - 1) * 100;
-
-		if(res > 10)
-		{
-			return 1;
-		}
-
-		else
-			return 0;
-	}
-
-	else if(measuredDist == newDist)
+	float dist = abs(measuredDist - newDist);
+	if(dist > 3)
+		return 1;
+	else
 		return 0;
+}
+
+/*
+ * @brief	A method used for measureing the distance of the ultrasonic
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date	11/05/21
+ * */
+float ultrasonic_mesuareDist()
+{
+	float distance;
+
+	ultrasonic_reset();
+	ultrasonic_pulse();
+
+
+	/* Measure distance only once. Same as in while(1) loop */
+	uint32_t ticks;
+	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_RESET)
+
+	ticks = 0;
+	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_SET)
+	{
+		ticks++;
+		microDelay(2);
+	}
+
+	/* Calculate distance */
+	distance = ticks * 2.8 * (0.0343 / 2);
+	return distance;
 }
 
 /*
