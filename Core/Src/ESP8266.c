@@ -125,7 +125,6 @@ void esp8266_sendDistance(float distance)
 	esp8266_sendCommand(tcp_connect);
 
 	char http_request[200];
-	char deviceID[] = "101";
 	sprintf(http_request, "GET /api/data?code=Dx7Hf/AoJhpxh3mVtnWh94wXNe6a2ImWuNtIYVEGlB8v3a3GVj2F5w==&deviceId=%s&distance=%.1f HTTP/1.1\r\n"
 			"Host: smartbin.azurewebsites.net\r\n\r\n", deviceID, distance);
 
