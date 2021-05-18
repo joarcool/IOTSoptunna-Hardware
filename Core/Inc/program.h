@@ -1,9 +1,11 @@
-/*
- * program.h
- *
- *  Created on: May 17, 2021
- *      Author: jorre
- */
+/**
+ * @brief program.h contains all the includes and defines of fungctions smartbin program.
+ * @details
+ * @file program.h
+ * @author  Joar Edling, joaredl@kth.se , Axel Ström, axst@kth.se
+ * @date 06-05-2021
+ * @version 1
+**/
 
 #ifndef INC_PROGRAM_H_
 #define INC_PROGRAM_H_
