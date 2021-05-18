@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "program.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -91,7 +91,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
-  Test_program();
+  //Test_program();
+  program_main();
   /* USER CODE END 2 */
 
   /* Infinite loop */
