@@ -1,12 +1,11 @@
 /**
-******************************************************************************
-@brief functions for the ESP8266 wifi-module
-@details
-@file ESP8266.c
-@author  Joar Edling, joaredl@kth.se
-@date 06-05-2021
-@version 2
-*******************************************************************************/
+ * @brief ESP8266.c contains all the functions for the ESP8266 wifi-module used for smartbin
+ * @details
+ * @file ESP8266.c
+ * @author  Joar Edling, joaredl@kth.se
+ * @date 06-05-2021
+ * @version 1
+**/
 #include "ESP8266.h"
 
 /* Global variables */
@@ -16,12 +15,12 @@ static uint8_t rx_buffer_index = 0;
 static bool error_flag = false;
 static bool fail_flag = false;
 
-
+/* Initialize interrupts for ESP8266 */
 void init_uart_interrupt(void){
 	HAL_UART_Receive_IT(&huart4, &rx_variable, 1);
 }
 
-/* Probably not the most efficient solution */
+/* Used for reading the response message sent back from ESP8266 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
@@ -32,7 +31,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 /* djb2 hashing algorithm which is used in mapping sent commands to the right ESP8266 response code */
-const unsigned long hash(const char *str) {
+const unsigned long hash(const char *str)
+{
     unsigned long hash = 5381;
     int c;
 
@@ -41,6 +41,7 @@ const unsigned long hash(const char *str) {
     return hash;
 }
 
+/* Used for sending commands to ESP8266 and send back the response */
 const char* esp8266_sendCommand(const char* command)
 {
 	rx_buffer_index = 0;
@@ -61,33 +62,14 @@ const char* esp8266_sendCommand(const char* command)
 			break;
 		}
 	}
-
-	//HAL_UART_Transmit(&huart4, (uint8_t*) rx_buffer, strlen(rx_buffer), 100);
-	//return evaluate(); would more efficient but not as clear in testing
 	return get_return(command);
 }
 
-const char* esp8266_send_data(const char* data){
-
-	/* if the function is called after an error, cancel */
-	if(error_flag || fail_flag)
-		return ESP8266_AT_ERROR;
-	rx_buffer_index = 0;
-
-	memset(rx_buffer, 0, RX_BUFFER_SIZE);
-	HAL_UART_Transmit(&huart4, (uint8_t*) data, strlen(data), 100);
-
-	while((strstr(rx_buffer, ESP8266_AT_CLOSED) == NULL));
-
-	return ESP8266_AT_CLOSED;
-}
-
-/*void esp8266_get_wifi_command(char* ref){
-	sprintf (ref, "%s\"%s\",\"%s\"\r\n", ESP8266_AT_CWJAP_SET, SSID, PWD);
-}*/
-
-void esp8266_initialize()
+/* Used for initialize the ESP8266 */
+int esp8266_initialize()
 {
+	char uart_buf[50];
+
 	//Step 1, enable interrupts
 	init_uart_interrupt();
 
@@ -98,40 +80,87 @@ void esp8266_initialize()
 
 	//Step 3, connect to wifi using "networkinfo.h"
 	char connect_wifi[30];
+	char* response;
+	int count = 0;
 	sprintf (connect_wifi, "%s\"%s\",\"%s\"\r\n", ESP8266_AT_CWJAP_SET, SSID, PWD);
-	HAL_UART_Transmit(&huart2, (uint8_t *) connect_wifi, strlen(connect_wifi), 100); //For testing
-	esp8266_sendCommand(connect_wifi);
+	//HAL_UART_Transmit(&huart2, (uint8_t *) connect_wifi, strlen(connect_wifi), 100); //For testing
+	sprintf(uart_buf, "Connecting to: %s\r\n", SSID);
+	HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+	while(response != ESP8266_AT_WIFI_CONNECTED)
+	{
+		response = esp8266_sendCommand(connect_wifi);
+		sprintf(uart_buf, "Response from ESP8266: %s\r\n", response);
+		HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+		if(response != ESP8266_AT_WIFI_CONNECTED)
+		{
+			sprintf(uart_buf, "Trying again...\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+			HAL_Delay(1000);
+			count++;
+			if(count >= 5)
+				return 0;
+		}
+	}
 
-	return;
+	return 1;
 }
 
-void esp8266_get_connection_command(char* ref, char* connection_type, char* remote_ip, char* remote_port){
-	sprintf(ref, "%s\"%s\",\"%s\",%s\r\n", ESP8266_AT_START, connection_type, remote_ip, remote_port);
-}
-
-void eps8266_connection()
+/* Used for sending distance to the smartbin website */
+int esp8266_sendDistance(float distance)
 {
-	char tcp_connect[30];
+	char uart_buf[60];
+	char* response;
+	int count = 0;
+
+	//Step 1, establish a TCP connection with smartbin webiste
+	char tcp_connect[300];
+	sprintf(uart_buf, "Establishing a TCP connection with smartbin website...\r\n");
+	HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
 	sprintf(tcp_connect, "%s\"%s\",\"%s\",%s\r\n", ESP8266_AT_START, connection_type, remote_ip, remote_port);
-	//HAL_UART_Transmit(&huart2, (uint8_t *) tcp_connect, strlen(tcp_connect), 100); //For testing
-	esp8266_sendCommand(tcp_connect);
-	return;
-}
+	while(response != ESP8266_AT_CONNECT)
+	{
+		response = esp8266_sendCommand(tcp_connect);
+		sprintf(uart_buf, "Response from ESP8266: %s\r\n", response);
+		HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+		if(response != ESP8266_AT_CONNECT)
+		{
+			sprintf(uart_buf, "Trying again...\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+			/*sprintf(uart_buf, "Response from ESP8266: %s\r\n", response);
+			HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+			*/HAL_Delay(1000);
+			count++;
+			if(count >= 5)
+				return 0;
+		}
+	}
 
-void esp8266_get_at_send_command(char* ref, uint8_t len){
-	sprintf(ref, "%s%d\r\n", ESP8266_AT_SEND, len);
-}
 
-uint8_t esp8266_http_get_request(char* ref, const char* http_type, char* uri, char* host){
-	sprintf(ref, "%s%s %s\r\n%s%s\r\n%s\r\n\r\n", http_type, uri, HTTP_VERSION, HTTP_HOST, host, HTTP_CONNECTION_CLOSE);
-	return (strlen(ref));
-}
+	//Step 2, send the HTTP message containing distance to smartbin website and close the TCP connection
+	sprintf(uart_buf, "Sending update message to smartbin website...\r\n");
+	HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+	char http_request[200];
+	sprintf(http_request, "GET /api/data?code=Dx7Hf/AoJhpxh3mVtnWh94wXNe6a2ImWuNtIYVEGlB8v3a3GVj2F5w==&deviceId=%s&distance=%.1f HTTP/1.1\r\n"
+			"Host: smartbin.azurewebsites.net\r\n"
+			"Connection: close\r\n\r\n", deviceID, distance);
 
+	char tcp_send[100];
+	sprintf(tcp_send, "AT+CIPSEND=%d\r\n", strlen(http_request));
+	response = esp8266_sendCommand(tcp_send);
+	sprintf(uart_buf, "Response from ESP8266: %s\r\n", response);
+	HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+
+	HAL_UART_Transmit(&huart4, (uint8_t*) http_request, strlen(http_request), 100);
+	sprintf(uart_buf, "Update message sent!\r\n\r\n");
+	HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+
+	return 1;
+}
 /* Returns the ESP8266 response code that is in the rx_buffer as a string,
- * this makes debugging and verification through testing easier, at the
- * cost of simplicity.
+ * this makes debugging and verification through testing easier.
  */
-const char* get_return(const char* command){
+const char* get_return(const char* command)
+{
 
 	if(strstr(command, ESP8266_AT_CWJAP_SET) != NULL)
 		command = ESP8266_AT_CWJAP_SET;
@@ -141,7 +170,8 @@ const char* get_return(const char* command){
 		command = ESP8266_AT_SEND;
 
 	KEYS return_type = hash(command);
-	switch (return_type) {
+	switch (return_type)
+	{
 
 		case ESP8266_AT_KEY:
 
@@ -159,7 +189,8 @@ const char* get_return(const char* command){
 		case ESP8266_AT_CWMODE_TEST_KEY:
 			if(error_flag || fail_flag)
 				return ESP8266_AT_ERROR;
-			else {
+			else
+			{
 				if (strstr(rx_buffer, ESP8266_AT_CWMODE_1) != NULL)
 					return ESP8266_AT_CWMODE_1;
 				else if(strstr(rx_buffer, ESP8266_AT_CWMODE_2) != NULL)
@@ -173,7 +204,8 @@ const char* get_return(const char* command){
 		case ESP8266_AT_CWJAP_TEST_KEY:
 			if(error_flag || fail_flag)
 				return ESP8266_AT_ERROR;
-			else {
+			else
+			{
 				if(strstr(rx_buffer, ESP8266_AT_NO_AP))
 					return ESP8266_AT_WIFI_DISCONNECTED;
 				else
@@ -181,7 +213,8 @@ const char* get_return(const char* command){
 			}
 
 		case ESP8266_AT_CWJAP_SET_KEY:
-			if(fail_flag || error_flag){
+			if(fail_flag || error_flag)
+			{
 				if (strstr(rx_buffer, ESP8266_AT_CWJAP_1) != NULL)
 					return ESP8266_AT_TIMEOUT;
 				else if((strstr(rx_buffer, ESP8266_AT_CWJAP_2) != NULL))
@@ -199,7 +232,8 @@ const char* get_return(const char* command){
 		case ESP8266_AT_CIPMUX_TEST_KEY:
 			if(error_flag || fail_flag)
 				return ESP8266_AT_ERROR;
-			else {
+			else
+			{
 				if (strstr(rx_buffer, ESP8266_AT_CIPMUX_0) != NULL)
 					return ESP8266_AT_CIPMUX_0;
 				else
@@ -222,7 +256,9 @@ const char* get_return(const char* command){
 	}
 }
 
-const char* evaluate(void){
+/* Shortly used for evaluating if error or not */
+const char* evaluate(void)
+{
 	if(error_flag || fail_flag)
 		return ESP8266_AT_ERROR;
 	return ESP8266_AT_OK;

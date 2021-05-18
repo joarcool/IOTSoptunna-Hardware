@@ -60,7 +60,6 @@ void ultrasonic_pulse(void)
  * */
 int ultrasonic_checkDist(float measuredDist, float newDist)
 {
-
 	float dist = abs(measuredDist - newDist);
 
 	if(dist > 3)
@@ -83,6 +82,27 @@ float ultrasonic_measureDist()
 	ultrasonic_reset();
 	ultrasonic_pulse();
 
+
+=======
+	float dist = abs(measuredDist - newDist);
+	if(dist > 3)
+		return 1;
+	else
+		return 0;
+}
+
+/*
+ * @brief	A method used for measureing the distance of the ultrasonic
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date	11/05/21
+ * */
+float ultrasonic_mesuareDist()
+{
+	float distance;
+
+	ultrasonic_reset();
+	ultrasonic_pulse();
 
 	/* Measure distance only once. Same as in while(1) loop */
 	uint32_t ticks;
