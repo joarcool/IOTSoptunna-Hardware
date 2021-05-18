@@ -6,9 +6,11 @@
  * */
 
 #include "stdio.h"
+#include "stdlib.h"
 
 void microDelay(uint32_t uSec);
 void ultrasonic_reset(void);
 void ultrasonic_pulse(void);
 void ultrasonic_program(void);
 int ultrasonic_checkDist(float measuredDist, float newDist);
+float ultrasonic_measureDist(void);

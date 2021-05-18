@@ -70,7 +70,39 @@ int ultrasonic_checkDist(float measuredDist, float newDist)
 }
 
 /*
- * @brief	Whole logic of the distance measuring program. Calculates distance from sensor to object.
+ * @brief	A method used for measuring the distance of the ultrasonic sensor.
+ * 			Used in the final program "program_main".
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date	11/05/21
+ * */
+float ultrasonic_measureDist()
+{
+	float distance;
+
+	ultrasonic_reset();
+	ultrasonic_pulse();
+
+
+	/* Measure distance only once. Same as in while(1) loop */
+	uint32_t ticks;
+	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_RESET)
+
+	ticks = 0;
+	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_SET)
+	{
+		ticks++;
+		microDelay(2);
+	}
+
+	/* Calculate distance */
+	distance = ticks * 2.8 * (0.0343 / 2);
+	return distance;
+}
+
+/*
+ * @brief	Whole logic of the distance measuring test program. Calculates distance from sensor to object.
+ * 			Used for testing purposes. NOT implemented in the final program.
  * @file	ultrasonic.c
  * @author	Axel Ström
  * @date	11/05/21
