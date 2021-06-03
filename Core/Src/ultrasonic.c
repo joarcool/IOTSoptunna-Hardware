@@ -53,13 +53,37 @@ void ultrasonic_pulse(void)
 }
 
 /*
- * @brief	Simple algorithm that checks if the measured distance has changed +- 3 cm.
+ * @brief	Simple algorithm that checks if the measured distance has changed +-3 cm.
  * @file	ultrasonic.c
  * @author	Axel Ström
  * @date	11/05/21
  * */
 int ultrasonic_checkDist(float measuredDist, float newDist)
 {
+	float dist = abs(measuredDist - newDist);
+
+	if(dist > 3)
+		return 1;
+	else
+		return 0;
+}
+
+/*
+ * @brief	A method used for measuring the distance of the ultrasonic sensor.
+ * 			Used in the final program "program_main".
+ * @file	ultrasonic.c
+ * @author	Axel Ström
+ * @date	11/05/21
+ * */
+float ultrasonic_measureDist()
+{
+	float distance;
+
+	ultrasonic_reset();
+	ultrasonic_pulse();
+
+
+=======
 	float dist = abs(measuredDist - newDist);
 	if(dist > 3)
 		return 1;
@@ -80,7 +104,6 @@ float ultrasonic_mesuareDist()
 	ultrasonic_reset();
 	ultrasonic_pulse();
 
-
 	/* Measure distance only once. Same as in while(1) loop */
 	uint32_t ticks;
 	while(HAL_GPIO_ReadPin(ECHO_GPIO_Port, ECHO_Pin) == GPIO_PIN_RESET)
@@ -98,7 +121,8 @@ float ultrasonic_mesuareDist()
 }
 
 /*
- * @brief	Whole logic of the distance measuring program. Calculates distance from sensor to object.
+ * @brief	Whole logic of the distance measuring test program. Calculates distance from sensor to object.
+ * 			Used for testing purposes. NOT implemented in the final program.
  * @file	ultrasonic.c
  * @author	Axel Ström
  * @date	11/05/21

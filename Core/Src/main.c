@@ -19,12 +19,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "test.h"
 #include "program.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,7 +49,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+TIM_HandleTypeDef htim4;
+UART_HandleTypeDef huart4;
+UART_HandleTypeDef huart2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,6 +95,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_UART4_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   //Test_program();
   program_main();

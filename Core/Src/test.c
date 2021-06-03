@@ -13,12 +13,19 @@
 #include "networkinfo.h"
 #include "ultrasonic.h"
 
+void Test_verifyMessage()
+{
+	char uart_buf[50];
+	sprintf(uart_buf, "Wifi connection verified!\r\n");
+	HAL_UART_Transmit(&huart2, (uint8_t *) uart_buf, strlen(uart_buf), 100);
+}
+
 void Test_program()
 {
-	//Test_wifi_connect();
-	//Test_connection();
+	Test_wifi_connect();
+	Test_connection();
 	//Test_sendData();
-	Test_ultrasonic();
+	//Test_ultrasonic();
 }
 
 void Test_wifi_connect()
@@ -30,6 +37,8 @@ void Test_wifi_connect()
 	esp8266_send_data("hej");*/
 
 	esp8266_initialize();
+	//Test_verifyMessage();
+
 	return;
 }
 
