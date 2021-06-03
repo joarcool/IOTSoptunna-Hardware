@@ -13,6 +13,12 @@
 
 #define usTIM TIM4
 
+/*
+* @brief	Function that delays in microseconds
+* @file		ultrasonic.c
+* @author	Axel Ström
+* @data		11/05/21
+*/
 void microDelay(uint32_t uSec)
 {
 	if(uSec < 2)
